@@ -1,0 +1,45 @@
+import boto3
+
+# AWS credentials and region
+#aws_access_key_id = ""
+#aws_secret_access_key = ""
+region_name = "eu-north-1"
+
+# Create an EC2 client
+ec2_client = boto3.client(
+    'ec2',
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
+    region_name=region_name
+)
+
+print(ec2_client)
+
+# Specify AMI ID and other parameters
+ami_id = "ami-08eb150f611ca277f"
+
+try:
+    # Launch EC2 instance
+    response = ec2_client.run_instances(
+        ImageId=ami_id,
+        InstanceType="t3.micro",
+        MinCount=1,
+        MaxCount=1,
+        #KeyName="Key-pair",  # Correct parameter name
+        TagSpecifications=[
+            {
+                "ResourceType": "instance",
+                "Tags": [
+                    {
+                        'Key': 'Name',
+                        'Value': 'BlackFriday'
+                    }
+                ]
+            }
+        ]
+    )
+    # Extract and print the instance ID
+    instance_id = response['Instances'][0]['InstanceId']
+    print(f'Launched EC2 instance with ID: {instance_id}')
+except Exception as e:
+    print(f"An error occurred: {e}")
